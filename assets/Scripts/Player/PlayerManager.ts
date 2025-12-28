@@ -105,6 +105,7 @@ export class PlayerManager extends Component {
       }else if(this._direction === DIRECTION_ENUM.RIGHT){
         this.direction = DIRECTION_ENUM.TOP
       }
+      //测试
 
       this.state = ENTITY_STATE_ENUM.TURNLEFT
       //this.fsm.setParames(getParamKey('TURNLEFT'), true)
