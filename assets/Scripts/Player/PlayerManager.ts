@@ -107,6 +107,7 @@ export class PlayerManager extends Component {
       }
       //测试
 
+      console.log("测试")
       this.state = ENTITY_STATE_ENUM.TURNLEFT
       //this.fsm.setParames(getParamKey('TURNLEFT'), true)
     }
