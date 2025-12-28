@@ -1,10 +1,10 @@
 import { _decorator, AnimationClip, Component, Node, Animation, SpriteFrame } from 'cc'
-import { FSM_PARAMS_TYPE_ENUM, PARAME_NAME_ENUM, getParamKey } from '../../Enums'
+import { DIRECTION_ENUM, FSM_PARAMS_TYPE_ENUM, PARAME_NAME_ENUM, getParamKey } from '../../Enums'
 import State from '../../Base/State'
 import { getInitParmesNumber, getInitParmesTrigger, StateMachine } from '../../Base/StateMachine'
+import IdleSubStateMachine from './IdleSubStateMachine'
+import TurnLeftSubStateMachine from './TurnLeftSubStateMachine'
 const { ccclass, property } = _decorator
-
-
 
 @ccclass('PlayerStateMachine')
 export class PlayerStateMachine extends StateMachine {
@@ -29,6 +29,10 @@ export class PlayerStateMachine extends StateMachine {
       new State(this, 'texture/player/idle/top', AnimationClip.WrapMode.Loop),
     )
     this.starteMachines.set(getParamKey('TURNLEFT'), new State(this, 'texture/player/turnleft/top'))
+  }
+  initStateMachines() {
+    this.starteMachines.set(PARAME_NAME_ENUM.IDLE, new IdleSubStateMachine(this))
+    this.starteMachines.set(PARAME_NAME_ENUM.TURNLEFT, new TurnLeftSubStateMachine(this))
   }
 
   initAnimationEvent() {
