@@ -4,6 +4,7 @@ import { TILE_WIDTH } from '../Scripts/Tlie/TileManager'
 import ResourceManager from '../Runtime/ResourceManager'
 import { getParamKey } from '../Enums'
 import { StateMachine } from './StateMachine'
+import { sortSpriteFrame } from '../Utils'
 
 /**
  * 1.需要知道aimationClip
@@ -29,7 +30,10 @@ export default class State {
 
     const track = new animation.ObjectTrack() // 创建一个对象轨道
     track.path = new animation.TrackPath().toComponent(Sprite).toProperty('spriteFrame') // 指定轨道路径，即指定目标对象为 "Foo" 子节点的 "position" 属性
-    const frames: Array<[number, SpriteFrame]> = spriteFrames.map((item, index) => [ANIMATION_SPEED * index, item])
+    const frames: Array<[number, SpriteFrame]> = sortSpriteFrame(spriteFrames).map((item, index) => [
+      ANIMATION_SPEED * index,
+      item,
+    ])
     track.channel.curve.assignSorted(frames)
 
     // 最后将轨道添加到动画剪辑以应用

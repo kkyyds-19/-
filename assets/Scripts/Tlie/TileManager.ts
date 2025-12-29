@@ -17,30 +17,32 @@ export class TileManager extends Component {
   turnble: boolean
 
   init(type: TILE_TYPE_ENUM, spriteFrame: SpriteFrame, i: number, j: number) {
-    this.type
+    this.type = type
     if (
-      this.type === TILE_TYPE_ENUM.WALL_ROW ||
-      this.type === TILE_TYPE_ENUM.WALL_COLUMN ||
-      this.type === TILE_TYPE_ENUM.WALL_LEFT_TOP ||
-      this.type === TILE_TYPE_ENUM.WALL_RIGHT_TOP ||
-      this.type === TILE_TYPE_ENUM.WALL_LEFT_BOTTOM ||
-      this.type === TILE_TYPE_ENUM.WALL_RIGHT_BOTTOM
+      type === TILE_TYPE_ENUM.WALL_ROW ||
+      type === TILE_TYPE_ENUM.WALL_COLUMN ||
+      type === TILE_TYPE_ENUM.WALL_LEFT_TOP ||
+      type === TILE_TYPE_ENUM.WALL_RIGHT_TOP ||
+      type === TILE_TYPE_ENUM.WALL_LEFT_BOTTOM ||
+      type === TILE_TYPE_ENUM.WALL_RIGHT_BOTTOM
     ) {
       this.moveable = false
       this.turnble = false
     } else if (
-      this.type === TILE_TYPE_ENUM.CLIFF_CENTER ||
-      this.type === TILE_TYPE_ENUM.CLIFF_LEFT ||
-      this.type === TILE_TYPE_ENUM.CLIFF_RIGHT
+      type === TILE_TYPE_ENUM.CLIFF_CENTER ||
+      type === TILE_TYPE_ENUM.CLIFF_LEFT ||
+      type === TILE_TYPE_ENUM.CLIFF_RIGHT
     ) {
       this.moveable = false
       this.turnble = true
-    } else if (this.type === TILE_TYPE_ENUM.FLOOR) {
+    } else if (type === TILE_TYPE_ENUM.FLOOR) {
       this.moveable = true
       this.turnble = true
+    } else {
+      this.moveable = false
+      this.turnble = false
     }
     const sprite = this.addComponent(Sprite)
-    this.type = type
     sprite.spriteFrame = spriteFrame
 
     const transform = this.getComponent(UITransform)

@@ -43,6 +43,8 @@ export enum PARAME_NAME_ENUM {
   TURNLEFT = 'TURNLEFT',
   TURNRIGHT = 'TURNRIGHT',
   DIRECTION = 'DIRECTION',
+  BLOCKFRONT = 'BLOCKFRONT',
+  BLOCKTURNLEFT = 'BLOCKTURNLEFT',
 }
 
 export const getParamKey = (name: keyof typeof PARAME_NAME_ENUM | string) => {
@@ -52,9 +54,13 @@ export const getParamKey = (name: keyof typeof PARAME_NAME_ENUM | string) => {
 }
 
 export enum DIRECTION_ENUM {
+  /** 上：对应二维数组行索引减小 (y-1) */
   TOP = 'TOP',
+  /** 下：对应二维数组行索引增加 (y+1) */
   BOTTOM = 'BOTTOM',
+  /** 左：对应二维数组列索引减小 (x-1) */
   LEFT = 'LEFT',
+  /** 右：对应二维数组列索引增加 (x+1) */
   RIGHT = 'RIGHT',
 }
 
@@ -62,6 +68,8 @@ export enum ENTITY_STATE_ENUM {
   IDLE = 'IDLE',
   TURNLEFT = 'TURNLEFT',
   TURNRIGHT = 'TURNRIGHT',
+  BLOCKFRONT = 'BLOCKFRONT',
+  BLOCKTURNLEFT = 'BLOCKTURNLEFT',
 }
 
 export enum DIRECTION_ORDER_ENUM {
