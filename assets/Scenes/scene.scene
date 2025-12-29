@@ -1420,7 +1420,7 @@
     "component": "",
     "_componentId": "8fd9f38tzBGdIn+dCtvB52j",
     "handler": "handleCtrl",
-    "customEventData": ""
+    "customEventData": "TURNRIGHT"
   },
   {
     "__type__": "cc.Node",
