@@ -1,0 +1,16 @@
+import DirectionSubStateMachine from '../../Base/DirectionSubStateMachine'
+import State from '../../Base/State'
+import { StateMachine } from '../../Base/StateMachine'
+import { SubStateMachine } from '../../Base/SubStateMachine'
+import { DIRECTION_ENUM, DIRECTION_ORDER_ENUM, PARAME_NAME_ENUM } from '../../Enums'
+
+const BASE_URL = 'texture/player/turnleft'
+export default class TurnLeftSubStateMachine extends DirectionSubStateMachine {
+  constructor(fsm: StateMachine) {
+    super(fsm)
+    this.starteMachines.set(DIRECTION_ENUM.TOP, new State(fsm, `${BASE_URL}/top`))
+    this.starteMachines.set(DIRECTION_ENUM.BOTTOM, new State(fsm, `${BASE_URL}/bottom`))
+    this.starteMachines.set(DIRECTION_ENUM.LEFT, new State(fsm, `${BASE_URL}/left`))
+    this.starteMachines.set(DIRECTION_ENUM.RIGHT, new State(fsm, `${BASE_URL}/right`))
+  }
+}
