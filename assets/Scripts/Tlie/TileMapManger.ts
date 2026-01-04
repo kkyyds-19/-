@@ -34,6 +34,7 @@ export class TileMapManger extends Component {
 
         // 优化：对部分基础瓦片添加有限随机变化，减少重复感
 
+        //测试
         let number = item.src
         if ((number === 1 || number === 5 || number === 9) && i % 2 === 0 && j % 2 === 0) {
           console.log('[TileMapManger] randomByRange type:', typeof randomByRange)
