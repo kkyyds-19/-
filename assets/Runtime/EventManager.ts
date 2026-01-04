@@ -1,4 +1,4 @@
-import Singleton from "../Base/Singleton";
+import Singleton from '../Base/Singleton';
 
 interface IItem{
   func:Function
@@ -17,7 +17,7 @@ export default class EventManager extends Singleton{
   }
 
   /** 事件字典：事件名 => 回调与上下文列表 */
-  private eventDic : Map<String,Array<IItem>> = new Map()
+  private eventDic : Map<string,Array<IItem>> = new Map()
 
   /**
    * 订阅事件

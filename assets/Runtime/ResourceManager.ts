@@ -1,6 +1,6 @@
-import { log, resources, Sprite, SpriteFrame } from "cc";
-import Singleton from "../Base/Singleton";
-import { ITile } from "../Levels";
+import { log, resources, Sprite, SpriteFrame } from 'cc';
+import Singleton from '../Base/Singleton';
+import { ITile } from '../Levels';
 
 /**
  * 资源管理器：封装常用资源加载方法

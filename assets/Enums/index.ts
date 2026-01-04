@@ -22,6 +22,7 @@ export enum EVENT_ENUM {
   /** 进入下一个关卡 */
   NEXT_LEVEL = 'NEXT_LEVEL',
   PLAYER_CTRL = 'PLAYER_CTRL',
+  PLAYER_MOVE_END = 'PLAYER_MOVE_END',
 }
 
 export enum CONTROLLER_ENUM {

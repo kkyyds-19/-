@@ -76,6 +76,7 @@ export class PlayerManager extends EntityManager {
         this.direction = DIRECTION_ENUM.TOP
       }
 
+      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
       this.state = ENTITY_STATE_ENUM.TURNLEFT
     } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT) {
       if (this.direction === DIRECTION_ENUM.TOP) {

@@ -3,8 +3,8 @@
  * - `mapInfo` 为二维数组，每个元素描述一个瓦片的资源编号与类型
  * - 行索引 i 与列索引 j 分别用于定位瓦片坐标
  */
-import { ILevel } from ".";
-import { TILE_TYPE_ENUM } from "../Enums";
+import { ILevel } from '.';
+import { TILE_TYPE_ENUM } from '../Enums';
 
 const mapInfo = [
   [
