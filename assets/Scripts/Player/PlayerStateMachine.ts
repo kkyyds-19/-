@@ -8,6 +8,7 @@ import BlockFrontSubStateMachine from './BlockFrontSubStateMachine'
 import EventManager from '../../Runtime/EventManager'
 import { EntityManager } from '../../Base/EntityManager'
 import BlockTurnLeftSubStateMachine from './BlockTurnLeftSubStateMachine'
+import DeathSubStateMachine from './DeathSubStateMachine'
 
 const { ccclass, property } = _decorator
 
@@ -18,6 +19,7 @@ export class PlayerStateMachine extends StateMachine {
   private turnRightSubStateMachine: TurnRightSubStateMachine
   private blockfrontStateMachine: BlockFrontSubStateMachine
   private blockturnleftSubStateMachine: BlockTurnLeftSubStateMachine
+  private deathSubStateMachine: DeathSubStateMachine
 
   async init() {
     this.animationComponent = this.addComponent(Animation)
@@ -35,6 +37,7 @@ export class PlayerStateMachine extends StateMachine {
     this.params.set(getParamKey('TURNRIGHT'), getInitParmesTrigger())
     this.params.set(getParamKey('DIRECTION'), getInitParmesNumber())
     this.params.set(getParamKey('BLOCKTURNLEFT'), getInitParmesTrigger())
+    this.params.set(getParamKey('DEATH'), getInitParmesTrigger())
   }
 
   initStateMachines() {
@@ -43,6 +46,7 @@ export class PlayerStateMachine extends StateMachine {
     this.turnRightSubStateMachine = new TurnRightSubStateMachine(this)
     this.blockfrontStateMachine = new BlockFrontSubStateMachine(this)
     this.blockturnleftSubStateMachine = new BlockTurnLeftSubStateMachine(this)
+    this.deathSubStateMachine = new DeathSubStateMachine(this)
   }
 
   initAnimationEvent() {
@@ -61,7 +65,10 @@ export class PlayerStateMachine extends StateMachine {
     const idle = this.getParames(getParamKey('IDLE'))
     const blockfront = this.getParames(getParamKey('BLOCKFRONT'))
     const blockturnleft = this.getParames(getParamKey('BLOCKTURNLEFT'))
-    if (turnLeft) {
+    const death = this.getParames(getParamKey('DEATH'))
+    if (death) {
+      this.deathSubStateMachine.run()
+    } else if (turnLeft) {
       this.turnLeftSubStateMachine.run()
     } else if (turnRight) {
       this.turnRightSubStateMachine.run()

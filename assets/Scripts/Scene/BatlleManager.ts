@@ -87,17 +87,20 @@ export class BatlleManager extends Component {
     this.adaptPos()
   }
 
-  generatePlayer() {
+  async generatePlayer() {
     const player = createUINode() //地图
     player.setParent(this.stage)
     const playerManager = player.addComponent(PlayerManager)
-    playerManager.init()
+    await playerManager.init()
+    DateManager.Instance.player = playerManager
+    EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN, playerManager)
   }
-  generateEnemies() {
+  async generateEnemies() {
     const enemy = createUINode() //地图
     enemy.setParent(this.stage)
     const woodenSkeletonManager = enemy.addComponent(WoodenSkeletonManager)
-    woodenSkeletonManager.init()
+    await woodenSkeletonManager.init()
+    DateManager.Instance.enemies.push(woodenSkeletonManager)
   }
 
   /** 根据地图尺寸将舞台居中偏移 */

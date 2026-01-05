@@ -7,6 +7,8 @@ import { log } from 'cc'
 import Singleton from '../Base/Singleton'
 import { ITile } from '../Levels'
 import { TileManager } from '../Scripts/Tlie/TileManager'
+import { PlayerManager } from '../Scripts/Player/PlayerManager'
+import { WoodenSkeletonManager } from '../Scripts/WoodenSkeleton/WoodenSkeletonManager'
 
 export default class DateManager extends Singleton {
   static get Instance() {
@@ -22,9 +24,15 @@ export default class DateManager extends Singleton {
   /** 当前关卡索引，默认从 1 开始 */
   levelIndex: number = 1
 
+  player: PlayerManager
+
+  enemies: WoodenSkeletonManager[]
+
   reset() {
     this.mapInfo = []
     this.tileInfo = []
+    this.enemies = []
+    this.player = null
     this.mapRowCount = 0
     this.mapColumnCount = 0
   }

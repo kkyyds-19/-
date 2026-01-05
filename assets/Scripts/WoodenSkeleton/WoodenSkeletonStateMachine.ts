@@ -1,7 +1,9 @@
 import { _decorator, Animation } from 'cc'
-import { getParamKey } from '../../Enums'
+import { ENTITY_STATE_ENUM, getParamKey } from '../../Enums'
 import { getInitParmesNumber, getInitParmesTrigger, StateMachine } from '../../Base/StateMachine'
 import IdleSubStateMachine from './IdleSubStateMachine'
+import AttackSubStateMachine from './AttackSubStateMachine'
+import { EntityManager } from '../../Base/EntityManager'
 
 const { ccclass, property } = _decorator
 
@@ -13,6 +15,7 @@ const { ccclass, property } = _decorator
 @ccclass('WoodenSkeletonStateMachine')
 export class WoodenSkeletonStateMachine extends StateMachine {
   private idleSubStateMachine: IdleSubStateMachine
+  private attackSubStateMachine: AttackSubStateMachine
 
   async init() {
     this.animationComponent = this.addComponent(Animation)
@@ -28,23 +31,39 @@ export class WoodenSkeletonStateMachine extends StateMachine {
     this.params.set(getParamKey('IDLE'), getInitParmesTrigger())
     // 初始化方向参数
     this.params.set(getParamKey('DIRECTION'), getInitParmesNumber())
+    // 初始化攻击触发参数
+    this.params.set(getParamKey('ATTACK'), getInitParmesTrigger())
   }
 
   initStateMachines() {
-    // 仅初始化待机子状态机
+    // 初始化待机子状态机
     this.idleSubStateMachine = new IdleSubStateMachine(this)
+    // 初始化攻击子状态机
+    this.attackSubStateMachine = new AttackSubStateMachine(this)
   }
 
   initAnimationEvent() {
-    // 基础动画事件监听，目前仅保留待机逻辑，可根据需要扩展
+    // 基础动画事件监听
     this.animationComponent.on(Animation.EventType.FINISHED, () => {
-      // 动画播放完成后，如果需要处理状态切换可以在此添加逻辑
+      const name = this.animationComponent.defaultClip.name
+      const whiteList = ['attack']
+      if (whiteList.some(v => name.includes(v))) {
+        this.node.getComponent(EntityManager).state = ENTITY_STATE_ENUM.IDLE
+      }
     })
   }
 
   run() {
-    // 核心运行逻辑：目前只保留IDLE状态的运行
-    this.idleSubStateMachine.run()
+    const idle = this.getParames(getParamKey('IDLE'))
+    const attack = this.getParames(getParamKey('ATTACK'))
+
+    if (attack) {
+      this.attackSubStateMachine.run()
+    } else if (idle) {
+      this.idleSubStateMachine.run()
+    } else {
+      this.idleSubStateMachine.run()
+    }
 
     // 重置所有触发器参数
     this.resetTrigger()

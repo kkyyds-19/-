@@ -13,6 +13,8 @@ export enum TILE_TYPE_ENUM {
   CLIFF_RIGHT = 'CLIFF_RIGHT',
   CLIFF_CENTER = 'CLIFF_CENTER',
   FLOOR = 'FLOOR',
+  DEATH = 'DEATH',
+  AIRDEATH = 'AIRDEATH',
 }
 
 /**
@@ -23,8 +25,11 @@ export enum EVENT_ENUM {
   NEXT_LEVEL = 'NEXT_LEVEL',
   PLAYER_CTRL = 'PLAYER_CTRL',
   PLAYER_MOVE_END = 'PLAYER_MOVE_END',
+  PLAYER_BORN = 'PLAYER_BORN',
+  ATTACK_PLAYER = 'ATTACK_PLAYER',
 }
 
+//区分玩家是在按“上/下/左/右”还是在执行“左转/右转”指令
 export enum CONTROLLER_ENUM {
   TOP = 'TOP',
   BOTTOM = 'BOTTOM',
@@ -46,6 +51,8 @@ export enum PARAME_NAME_ENUM {
   DIRECTION = 'DIRECTION',
   BLOCKFRONT = 'BLOCKFRONT',
   BLOCKTURNLEFT = 'BLOCKTURNLEFT',
+  ATTACK = 'ATTACK',
+  DEATH = 'DEATH',
 }
 
 export const getParamKey = (name: keyof typeof PARAME_NAME_ENUM | string) => {
@@ -71,6 +78,9 @@ export enum ENTITY_STATE_ENUM {
   TURNRIGHT = 'TURNRIGHT',
   BLOCKFRONT = 'BLOCKFRONT',
   BLOCKTURNLEFT = 'BLOCKTURNLEFT',
+  ATTACK = 'ATTACK',
+  DEATH = 'DEATH',
+  AIRDEATH = 'AIRDEATH',
 }
 
 export enum DIRECTION_ORDER_ENUM {
