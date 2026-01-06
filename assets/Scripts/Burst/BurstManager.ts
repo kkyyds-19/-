@@ -7,19 +7,21 @@ import { _decorator } from 'cc'
 import EventManager from '../../Runtime/EventManager'
 import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enums'
 import { EnemyManager } from '../../Base/EnemyManager'
-import { WoodenSkeletonStateMachine } from './WoodenSkeletonStateMachine'
 import DateManager from '../../Runtime/DateManager'
+import { WoodenSkeletonStateMachine } from '../WoodenSkeleton/WoodenSkeletonStateMachine'
+import { EntityManager } from '../../Base/EntityManager'
+import { BurstStateMachine } from './BurstStateMachine'
 
 const { ccclass } = _decorator
 
-@ccclass('WoodenSkeletonManager')
-export class WoodenSkeletonManager extends EnemyManager {
+@ccclass('BurstManager')
+export class BurstManager extends EntityManager {
   /**
    * 初始化木骷髅
    * 设置状态机并调用父类初始化
    */
   async init() {
-    this.fsm = this.addComponent(WoodenSkeletonStateMachine)
+    this.fsm = this.addComponent(BurstStateMachine)
     await this.fsm.init()
 
     // 调用父类初始化，传入木骷髅特定的初始参数

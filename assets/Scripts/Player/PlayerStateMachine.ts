@@ -1,14 +1,14 @@
 import { _decorator, Animation } from 'cc'
-import { ENTITY_STATE_ENUM, PARAME_NAME_ENUM, getParamKey } from '../../Enums'
+import { ENTITY_STATE_ENUM, getParamKey } from '../../Enums'
 import { getInitParmesNumber, getInitParmesTrigger, StateMachine } from '../../Base/StateMachine'
 import IdleSubStateMachine from './IdleSubStateMachine'
 import TurnLeftSubStateMachine from './TurnLeftSubStateMachine'
 import TurnRightSubStateMachine from './TurnRightSubStateMachine'
 import BlockFrontSubStateMachine from './BlockFrontSubStateMachine'
-import EventManager from '../../Runtime/EventManager'
 import { EntityManager } from '../../Base/EntityManager'
 import BlockTurnLeftSubStateMachine from './BlockTurnLeftSubStateMachine'
 import DeathSubStateMachine from './DeathSubStateMachine'
+import AttackSubStateMachine from './AttackSubStateMachine'
 
 const { ccclass, property } = _decorator
 
@@ -20,6 +20,7 @@ export class PlayerStateMachine extends StateMachine {
   private blockfrontStateMachine: BlockFrontSubStateMachine
   private blockturnleftSubStateMachine: BlockTurnLeftSubStateMachine
   private deathSubStateMachine: DeathSubStateMachine
+  private attackSubStateMachine: AttackSubStateMachine
 
   async init() {
     this.animationComponent = this.addComponent(Animation)
@@ -38,6 +39,7 @@ export class PlayerStateMachine extends StateMachine {
     this.params.set(getParamKey('DIRECTION'), getInitParmesNumber())
     this.params.set(getParamKey('BLOCKTURNLEFT'), getInitParmesTrigger())
     this.params.set(getParamKey('DEATH'), getInitParmesTrigger())
+    this.params.set(getParamKey('ATTACK'), getInitParmesTrigger())
   }
 
   initStateMachines() {
@@ -47,12 +49,13 @@ export class PlayerStateMachine extends StateMachine {
     this.blockfrontStateMachine = new BlockFrontSubStateMachine(this)
     this.blockturnleftSubStateMachine = new BlockTurnLeftSubStateMachine(this)
     this.deathSubStateMachine = new DeathSubStateMachine(this)
+    this.attackSubStateMachine = new AttackSubStateMachine(this)
   }
 
   initAnimationEvent() {
     this.animationComponent.on(Animation.EventType.FINISHED, () => {
       const name = this.animationComponent.defaultClip.name
-      const whiteList = ['block', 'turn']
+      const whiteList = ['block', 'turn', 'attack']
       if (whiteList.some(v => name.includes(v))) {
         this.node.getComponent(EntityManager).state = ENTITY_STATE_ENUM.IDLE
       }
@@ -66,8 +69,11 @@ export class PlayerStateMachine extends StateMachine {
     const blockfront = this.getParames(getParamKey('BLOCKFRONT'))
     const blockturnleft = this.getParames(getParamKey('BLOCKTURNLEFT'))
     const death = this.getParames(getParamKey('DEATH'))
+    const attack = this.getParames(getParamKey('ATTACK'))
     if (death) {
       this.deathSubStateMachine.run()
+    } else if (attack) {
+      this.attackSubStateMachine.run()
     } else if (turnLeft) {
       this.turnLeftSubStateMachine.run()
     } else if (turnRight) {

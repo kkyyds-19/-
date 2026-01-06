@@ -1,24 +1,18 @@
-import { _decorator, Animation } from 'cc'
+import { _decorator, Animation, AnimationClip } from 'cc'
 import { ENTITY_STATE_ENUM, getParamKey } from '../../Enums'
 import { getInitParmesNumber, getInitParmesTrigger, StateMachine } from '../../Base/StateMachine'
-import IdleSubStateMachine from './IdleSubStateMachine'
-import AttackSubStateMachine from './AttackSubStateMachine'
-import DeathSubStateMachine from './DeathSubStateMachine'
 import { EntityManager } from '../../Base/EntityManager'
+import State from '../../Base/State'
 
 const { ccclass, property } = _decorator
-
+const BASE_URL = 'texture/burst/'
 /**
  * 木骷髅状态机
  * @cocos_version Cocos Creator 3.x
  * @author 2026-01-04
  */
-@ccclass('WoodenSkeletonStateMachine')
-export class WoodenSkeletonStateMachine extends StateMachine {
-  private idleSubStateMachine: IdleSubStateMachine
-  private attackSubStateMachine: AttackSubStateMachine
-  private deathSubStateMachine: DeathSubStateMachine
-
+@ccclass('BurstStateMachine')
+export class BurstStateMachine extends StateMachine {
   async init() {
     this.animationComponent = this.addComponent(Animation)
     this.initParams()
@@ -40,12 +34,12 @@ export class WoodenSkeletonStateMachine extends StateMachine {
   }
 
   initStateMachines() {
-    // 初始化待机子状态机
-    this.idleSubStateMachine = new IdleSubStateMachine(this)
-    // 初始化攻击子状态机
-    this.attackSubStateMachine = new AttackSubStateMachine(this)
-    // 初始化死亡子状态机
-    this.deathSubStateMachine = new DeathSubStateMachine(this)
+    this.starteMachines.set(ENTITY_STATE_ENUM.IDLE, new State(this, `${BASE_URL}idle`, AnimationClip.WrapMode.Loop))
+    this.starteMachines.set(
+      ENTITY_STATE_ENUM.ATTACK,
+      new State(this, `${BASE_URL}attack`, AnimationClip.WrapMode.Normal),
+    )
+    this.starteMachines.set(ENTITY_STATE_ENUM.DEATH, new State(this, `${BASE_URL}death`, AnimationClip.WrapMode.Normal))
   }
 
   initAnimationEvent() {
@@ -65,13 +59,13 @@ export class WoodenSkeletonStateMachine extends StateMachine {
     const death = this.getParames(getParamKey('DEATH'))
 
     if (death) {
-      this.deathSubStateMachine.run()
+      this.currentState = this.starteMachines.get(ENTITY_STATE_ENUM.DEATH)
     } else if (attack) {
-      this.attackSubStateMachine.run()
+      this.currentState = this.starteMachines.get(ENTITY_STATE_ENUM.ATTACK)
     } else if (idle) {
-      this.idleSubStateMachine.run()
+      this.currentState = this.starteMachines.get(ENTITY_STATE_ENUM.IDLE)
     } else {
-      this.idleSubStateMachine.run()
+      this.currentState = this.starteMachines.get(ENTITY_STATE_ENUM.IDLE)
     }
 
     // 重置所有触发器参数

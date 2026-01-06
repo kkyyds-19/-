@@ -1,23 +1,23 @@
+/**
+ * 铁骷髅状态机
+ * @cocos_version Cocos Creator 3.x
+ * @author 2026-01-06
+ */
 import { _decorator, Animation } from 'cc'
 import { ENTITY_STATE_ENUM, getParamKey } from '../../Enums'
 import { getInitParmesNumber, getInitParmesTrigger, StateMachine } from '../../Base/StateMachine'
 import IdleSubStateMachine from './IdleSubStateMachine'
-import AttackSubStateMachine from './AttackSubStateMachine'
 import DeathSubStateMachine from './DeathSubStateMachine'
+import AttackSubStateMachine from './AttackSubStateMachine'
 import { EntityManager } from '../../Base/EntityManager'
 
-const { ccclass, property } = _decorator
+const { ccclass } = _decorator
 
-/**
- * 木骷髅状态机
- * @cocos_version Cocos Creator 3.x
- * @author 2026-01-04
- */
-@ccclass('WoodenSkeletonStateMachine')
-export class WoodenSkeletonStateMachine extends StateMachine {
+@ccclass('IronSkeletonStateMachine')
+export class IronSkeletonStateMachine extends StateMachine {
   private idleSubStateMachine: IdleSubStateMachine
-  private attackSubStateMachine: AttackSubStateMachine
   private deathSubStateMachine: DeathSubStateMachine
+  private attackSubStateMachine: AttackSubStateMachine
 
   async init() {
     this.animationComponent = this.addComponent(Animation)
@@ -33,36 +33,36 @@ export class WoodenSkeletonStateMachine extends StateMachine {
     this.params.set(getParamKey('IDLE'), getInitParmesTrigger())
     // 初始化方向参数
     this.params.set(getParamKey('DIRECTION'), getInitParmesNumber())
-    // 初始化攻击触发参数
-    this.params.set(getParamKey('ATTACK'), getInitParmesTrigger())
     // 初始化死亡触发参数
     this.params.set(getParamKey('DEATH'), getInitParmesTrigger())
+    // 初始化攻击触发参数
+    this.params.set(getParamKey('ATTACK'), getInitParmesTrigger())
   }
 
   initStateMachines() {
     // 初始化待机子状态机
     this.idleSubStateMachine = new IdleSubStateMachine(this)
-    // 初始化攻击子状态机
-    this.attackSubStateMachine = new AttackSubStateMachine(this)
     // 初始化死亡子状态机
     this.deathSubStateMachine = new DeathSubStateMachine(this)
+    // 初始化攻击子状态机
+    this.attackSubStateMachine = new AttackSubStateMachine(this)
   }
 
   initAnimationEvent() {
-    // 基础动画事件监听
     this.animationComponent.on(Animation.EventType.FINISHED, () => {
       const name = this.animationComponent.defaultClip.name
+      // 播放完攻击动画后回到Idle状态
       const whiteList = ['attack']
       if (whiteList.some(v => name.includes(v))) {
-        this.node.getComponent(EntityManager).state = ENTITY_STATE_ENUM.IDLE
+        this.setParames(getParamKey('IDLE'), true)
       }
     })
   }
 
   run() {
     const idle = this.getParames(getParamKey('IDLE'))
-    const attack = this.getParames(getParamKey('ATTACK'))
     const death = this.getParames(getParamKey('DEATH'))
+    const attack = this.getParames(getParamKey('ATTACK'))
 
     if (death) {
       this.deathSubStateMachine.run()
@@ -73,8 +73,5 @@ export class WoodenSkeletonStateMachine extends StateMachine {
     } else {
       this.idleSubStateMachine.run()
     }
-
-    // 重置所有触发器参数
-    this.resetTrigger()
   }
 }

@@ -2,6 +2,7 @@
  * 常用工具方法
  * - createUINode：创建默认锚点与 UI 图层的节点
  * - randomByRange：返回指定区间的随机整数
+ * - randomByLen：生成指定长度的随机数字字符串
  */
 import { Layers, Node, SpriteFrame, UITransform } from 'cc'
 
@@ -9,7 +10,7 @@ import { Layers, Node, SpriteFrame, UITransform } from 'cc'
  * 创建一个 UI 节点：锚点 (0,1)，图层为 UI_2D
  * @param name 节点名称
  */
-export const createUINode = (name: string = '') => {
+export const createUINode = (name = '') => {
   const node = new Node(name)
   const transform = node.addComponent(UITransform)
   transform.setAnchorPoint(0, 1)
@@ -17,6 +18,15 @@ export const createUINode = (name: string = '') => {
 
   return node
 }
+
+/**
+ * 生成指定长度的随机数字字符串
+ * @param len 指定的字符串长度
+ * @returns 包含随机数字的字符串
+ * @example randomByLen(4) -> "5821"
+ */
+export const randomByLen = (len: number) =>
+  Array.from({ length: len }).reduce<string>((total: string) => total + Math.floor(Math.random() * 10), '')
 
 /**
  * 返回 [start, end) 区间内的随机整数

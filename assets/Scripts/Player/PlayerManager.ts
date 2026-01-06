@@ -1,22 +1,26 @@
 import { _decorator } from 'cc'
 import EventManager from '../../Runtime/EventManager'
-import { CONTROLLER_ENUM, DIRECTION_ENUM, ENTITY_STATE_ENUM, EVENT_ENUM } from '../../Enums'
+import { CONTROLLER_ENUM, DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enums'
 import { EntityManager } from '../../Base/EntityManager'
 import { PlayerStateMachine } from './PlayerStateMachine'
 import DateManager from '../../Runtime/DateManager'
+import { IEntity } from '../../Levels'
 const { ccclass } = _decorator
 
 @ccclass('PlayerManager')
 export class PlayerManager extends EntityManager {
-  tragetX: number = 2
-  tragetY: number = 8
+  tragetX = 2
+  tragetY = 8
   isMoving = false
   private readonly speed = 1 / 10
 
-  async init() {
+  async init(params: Partial<IEntity>) {
     this.fsm = this.addComponent(PlayerStateMachine)
     await this.fsm.init()
-    await super.init({ x: 2, y: 8, direction: DIRECTION_ENUM.TOP, state: ENTITY_STATE_ENUM.IDLE })
+    await super.init({
+      ...params,
+      type: ENTITY_TYPE_ENUM.PLAYER,
+    })
 
     EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputHandle, this)
     EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDead, this)
@@ -48,7 +52,21 @@ export class PlayerManager extends EntityManager {
     if (this.isMoving) {
       return
     }
-    if (this.state === ENTITY_STATE_ENUM.DEATH || this.state === ENTITY_STATE_ENUM.AIRDEATH) {
+    if (
+      this.state === ENTITY_STATE_ENUM.DEATH ||
+      this.state === ENTITY_STATE_ENUM.AIRDEATH ||
+      this.state === ENTITY_STATE_ENUM.ATTACK
+    ) {
+      return
+    }
+    if (inputDirection === CONTROLLER_ENUM.ATTACK) {
+      this.state = ENTITY_STATE_ENUM.ATTACK
+      return
+    }
+    const id = this.willAtttack(inputDirection)
+    if (id) {
+      EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
+      EventManager.Instance.emit(EVENT_ENUM.DOOR_OPEN)
       return
     }
     if (this.willBlock(inputDirection)) {
@@ -112,9 +130,28 @@ export class PlayerManager extends EntityManager {
       this.state = ENTITY_STATE_ENUM.TURNRIGHT
     }
   }
+
+  willAtttack(type: CONTROLLER_ENUM) {
+    const enemies = DateManager.Instance.enemies.filter(enemy => enemy.state !== ENTITY_STATE_ENUM.DEATH)
+    for (let i = 0; i < enemies.length; i++) {
+      const { x: enemxX, y: enemyY, id: enemyId } = enemies[i]
+      if (
+        type === CONTROLLER_ENUM.TOP &&
+        this.direction === DIRECTION_ENUM.TOP &&
+        enemxX === this.x &&
+        enemyY === this.tragetY - 2
+      ) {
+        this.state = ENTITY_STATE_ENUM.ATTACK
+        return enemyId
+      }
+    }
+    return ''
+  }
+
   willBlock(inputDirection: CONTROLLER_ENUM) {
     const { x, y, direction } = this
     const { tileInfo } = DateManager.Instance
+    const enemies = DateManager.Instance.enemies.filter(enemy => enemy.state !== ENTITY_STATE_ENUM.DEATH)
 
     let nextX = x
     let nextY = y
@@ -169,6 +206,19 @@ export class PlayerManager extends EntityManager {
     // 这里的 DIRECTION_ENUM 决定了武器相对于人物的偏移量
     let weaponNextX = nextX
     let weaponNextY = nextY
+
+    // 2.1 检查 玩家本体 是否碰到 敌人
+    if (enemies.find(v => v.x === nextX && v.y === nextY)) {
+      this.state = ENTITY_STATE_ENUM.BLOCKFRONT
+      return true
+    }
+
+    // 2.2 检查 玩家本体 是否碰到 门（未开启状态）
+    const door = DateManager.Instance.door
+    if (door && door.state !== ENTITY_STATE_ENUM.DEATH && door.x === nextX && door.y === nextY) {
+      this.state = ENTITY_STATE_ENUM.BLOCKFRONT
+      return true
+    }
 
     if (nextDirection === DIRECTION_ENUM.TOP) {
       weaponNextY -= 1 // 武器在人物上方一格

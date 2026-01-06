@@ -4,29 +4,24 @@
  * @author 2026-01-06
  */
 import { _decorator } from 'cc'
-import EventManager from '../../Runtime/EventManager'
 import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enums'
 import { EnemyManager } from '../../Base/EnemyManager'
-import { WoodenSkeletonStateMachine } from './WoodenSkeletonStateMachine'
+import { IronSkeletonStateMachine } from './IronSkeletonStateMachine'
+import EventManager from '../../Runtime/EventManager'
 import DateManager from '../../Runtime/DateManager'
 
 const { ccclass } = _decorator
 
-@ccclass('WoodenSkeletonManager')
-export class WoodenSkeletonManager extends EnemyManager {
-  /**
-   * 初始化木骷髅
-   * 设置状态机并调用父类初始化
-   */
+@ccclass('IronSkeletonManager')
+export class IronSkeletonManager extends EnemyManager {
   async init() {
-    this.fsm = this.addComponent(WoodenSkeletonStateMachine)
+    this.fsm = this.addComponent(IronSkeletonStateMachine)
     await this.fsm.init()
 
-    // 调用父类初始化，传入木骷髅特定的初始参数
     await super.init({
       x: 2,
       y: 4,
-      type: ENTITY_TYPE_ENUM.SKELETON_WOODEN,
+      type: ENTITY_TYPE_ENUM.SKELETON_IRON,
       direction: DIRECTION_ENUM.TOP,
       state: ENTITY_STATE_ENUM.IDLE,
     })
@@ -35,9 +30,6 @@ export class WoodenSkeletonManager extends EnemyManager {
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack, this)
   }
 
-  /**
-   * 销毁时移除特定事件监听，并调用父类销毁
-   */
   onDestroy() {
     super.onDestroy()
     EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack)

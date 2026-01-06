@@ -12,9 +12,11 @@ import levels, { ILevel } from '../../Levels'
 import DateManager from '../../Runtime/DateManager'
 import { TILE_WIDTH } from '../Tlie/TileManager'
 import EventManager from '../../Runtime/EventManager'
-import { EVENT_ENUM } from '../../Enums'
+import { DIRECTION_ENUM, ENTITY_STATE_ENUM, EVENT_ENUM } from '../../Enums'
 import { PlayerManager } from '../Player/PlayerManager'
 import { WoodenSkeletonManager } from '../WoodenSkeleton/WoodenSkeletonManager'
+import { IronSkeletonManager } from '../IronSkeleton/IronSkeletonManager'
+import { DoorManager } from '../Door/DoorManager'
 const { ccclass, property } = _decorator
 
 @ccclass('BatlleManager')
@@ -57,6 +59,7 @@ export class BatlleManager extends Component {
       this.generateTileMap()
       this.generatePlayer()
       this.generateEnemies()
+      this.generateDoor()
     }
   }
 
@@ -91,7 +94,7 @@ export class BatlleManager extends Component {
     const player = createUINode() //地图
     player.setParent(this.stage)
     const playerManager = player.addComponent(PlayerManager)
-    await playerManager.init()
+    await playerManager.init({ x: 2, y: 8, direction: DIRECTION_ENUM.TOP, state: ENTITY_STATE_ENUM.IDLE })
     DateManager.Instance.player = playerManager
     EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN, playerManager)
   }
@@ -101,6 +104,27 @@ export class BatlleManager extends Component {
     const woodenSkeletonManager = enemy.addComponent(WoodenSkeletonManager)
     await woodenSkeletonManager.init()
     DateManager.Instance.enemies.push(woodenSkeletonManager)
+
+    const enemy2 = createUINode()
+    enemy2.setParent(this.stage)
+    const ironSkeletonManager = enemy2.addComponent(IronSkeletonManager)
+    await ironSkeletonManager.init()
+    ironSkeletonManager.x = 2
+    ironSkeletonManager.y = 2
+    DateManager.Instance.enemies.push(ironSkeletonManager)
+  }
+
+  async generateDoor() {
+    const door = createUINode() //地图
+    door.setParent(this.stage)
+    const doorManager = door.addComponent(DoorManager)
+    await doorManager.init({
+      x: 9,
+      y: 8,
+      direction: DIRECTION_ENUM.TOP,
+      state: ENTITY_STATE_ENUM.IDLE,
+    })
+    DateManager.Instance.door = doorManager
   }
 
   /** 根据地图尺寸将舞台居中偏移 */
