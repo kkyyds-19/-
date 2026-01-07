@@ -2,6 +2,9 @@ import { _decorator, Animation } from 'cc'
 import { getParamKey } from '../../Enums'
 import { getInitParmesNumber, StateMachine } from '../../Base/StateMachine'
 import SpikesOneSubStateMachine from './SpikesOneSubStateMachine'
+import SpilkesTwoSubStateMachine from './SpilkesTwoSubStateMachine'
+import SpikesThreeSubStateMachine from './SpikesThreeSubStateMachine'
+import SpikesFourSubStateMachine from './SpikesFourSubStateMachine'
 
 const { ccclass, property } = _decorator
 
@@ -13,6 +16,9 @@ const { ccclass, property } = _decorator
 @ccclass('SpikesStateMachine')
 export class SpikesStateMachine extends StateMachine {
   private spikesOneSubStateMachine: SpikesOneSubStateMachine
+  private spikesTwoSubStateMachine: SpilkesTwoSubStateMachine
+  private spikesThreeSubStateMachine: SpikesThreeSubStateMachine
+  private spikesFourSubStateMachine: SpikesFourSubStateMachine
 
   async init() {
     this.animationComponent = this.addComponent(Animation)
@@ -30,11 +36,25 @@ export class SpikesStateMachine extends StateMachine {
 
   initStateMachines() {
     this.spikesOneSubStateMachine = new SpikesOneSubStateMachine(this)
+    this.spikesTwoSubStateMachine = new SpilkesTwoSubStateMachine(this)
+    this.spikesThreeSubStateMachine = new SpikesThreeSubStateMachine(this)
+    this.spikesFourSubStateMachine = new SpikesFourSubStateMachine(this)
   }
 
   initAnimationEvent() {}
 
   run() {
-    this.spikesOneSubStateMachine.run()
+    const total = this.getParames(getParamKey('SPIKES_TOTAL_COUNT')) as number
+    if (total === 2) {
+      this.spikesOneSubStateMachine.run()
+    } else if (total === 3) {
+      this.spikesTwoSubStateMachine.run()
+    } else if (total === 4) {
+      this.spikesThreeSubStateMachine.run()
+    } else if (total === 5) {
+      this.spikesFourSubStateMachine.run()
+    } else {
+      this.spikesOneSubStateMachine.run()
+    }
   }
 }

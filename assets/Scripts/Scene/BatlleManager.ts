@@ -147,17 +147,25 @@ export class BatlleManager extends Component {
   }
 
   async generateSpikes() {
-    const spikes = createUINode() //地图
-    spikes.setParent(this.stage)
-    spikes.setSiblingIndex(1)
-    const spikesManager = spikes.addComponent(SpikesManager)
-    await spikesManager.init({
-      x: 2,
-      y: 7,
-      type: ENTITY_TYPE_ENUM.SPIKES_ONE,
-      count: 0,
-    })
-    DateManager.Instance.Spikes.push(spikesManager)
+    const configs = [
+      { x: 2, y: 6 },
+      { x: 3, y: 6 },
+      { x: 4, y: 6 },
+      { x: 5, y: 6 },
+    ]
+    for (const cfg of configs) {
+      const spikes = createUINode() //地图
+      spikes.setParent(this.stage)
+      spikes.setSiblingIndex(1)
+      const spikesManager = spikes.addComponent(SpikesManager)
+      await spikesManager.init({
+        x: cfg.x,
+        y: cfg.y,
+        type: ENTITY_TYPE_ENUM.SPIKES_ONE,
+        count: 0,
+      })
+      DateManager.Instance.Spikes.push(spikesManager)
+    }
   }
 
   /** 根据地图尺寸将舞台居中偏移 */
