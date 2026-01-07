@@ -5,7 +5,7 @@ import { EntityManager } from '../../Base/EntityManager'
 import State from '../../Base/State'
 
 const { ccclass, property } = _decorator
-const BASE_URL = 'texture/burst/'
+const BASE_URL = 'texture/burst'
 /**
  * 木骷髅状态机
  * @cocos_version Cocos Creator 3.x
@@ -34,24 +34,12 @@ export class BurstStateMachine extends StateMachine {
   }
 
   initStateMachines() {
-    this.starteMachines.set(ENTITY_STATE_ENUM.IDLE, new State(this, `${BASE_URL}idle`, AnimationClip.WrapMode.Loop))
-    this.starteMachines.set(
-      ENTITY_STATE_ENUM.ATTACK,
-      new State(this, `${BASE_URL}attack`, AnimationClip.WrapMode.Normal),
-    )
-    this.starteMachines.set(ENTITY_STATE_ENUM.DEATH, new State(this, `${BASE_URL}death`, AnimationClip.WrapMode.Normal))
+    this.starteMachines.set(ENTITY_STATE_ENUM.IDLE, new State(this, `${BASE_URL}/idle`)),
+      this.starteMachines.set(ENTITY_STATE_ENUM.ATTACK, new State(this, `${BASE_URL}/attack`)),
+      this.starteMachines.set(ENTITY_STATE_ENUM.DEATH, new State(this, `${BASE_URL}/death`))
   }
 
-  initAnimationEvent() {
-    // 基础动画事件监听
-    this.animationComponent.on(Animation.EventType.FINISHED, () => {
-      const name = this.animationComponent.defaultClip.name
-      const whiteList = ['attack']
-      if (whiteList.some(v => name.includes(v))) {
-        this.node.getComponent(EntityManager).state = ENTITY_STATE_ENUM.IDLE
-      }
-    })
-  }
+  initAnimationEvent() {}
 
   run() {
     const idle = this.getParames(getParamKey('IDLE'))

@@ -85,11 +85,16 @@ export class PlayerManager extends EntityManager {
   }
 
   onDead(type: ENTITY_STATE_ENUM) {
+    if (this.state === ENTITY_STATE_ENUM.DEATH || this.state === ENTITY_STATE_ENUM.AIRDEATH) {
+      return
+    }
+    this.isMoving = false
+    this.tragetX = this.x
+    this.tragetY = this.y
     this.state = type
   }
 
   move(inputDirection: CONTROLLER_ENUM) {
-    this.isMoving = true
     if (inputDirection === CONTROLLER_ENUM.TOP) {
       this.tragetY -= 1
       this.isMoving = true
@@ -103,6 +108,7 @@ export class PlayerManager extends EntityManager {
       this.tragetX += 1
       this.isMoving = true
     } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT) {
+      this.isMoving = false
       if (this.direction === DIRECTION_ENUM.TOP) {
         this.direction = DIRECTION_ENUM.LEFT
       } else if (this.direction === DIRECTION_ENUM.LEFT) {
@@ -112,11 +118,11 @@ export class PlayerManager extends EntityManager {
       } else if (this.direction === DIRECTION_ENUM.RIGHT) {
         this.direction = DIRECTION_ENUM.TOP
       }
-
-      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
-
       this.state = ENTITY_STATE_ENUM.TURNLEFT
+
+      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
     } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT) {
+      this.isMoving = false
       if (this.direction === DIRECTION_ENUM.TOP) {
         this.direction = DIRECTION_ENUM.RIGHT
       } else if (this.direction === DIRECTION_ENUM.RIGHT) {
@@ -126,8 +132,9 @@ export class PlayerManager extends EntityManager {
       } else if (this.direction === DIRECTION_ENUM.LEFT) {
         this.direction = DIRECTION_ENUM.TOP
       }
-      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
       this.state = ENTITY_STATE_ENUM.TURNRIGHT
+
+      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
     }
   }
 

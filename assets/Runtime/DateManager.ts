@@ -10,6 +10,8 @@ import { TileManager } from '../Scripts/Tlie/TileManager'
 import { PlayerManager } from '../Scripts/Player/PlayerManager'
 import { EnemyManager } from '../Base/EnemyManager'
 import { DoorManager } from '../Scripts/Door/DoorManager'
+import { BurstManager } from '../Scripts/Burst/BurstManager'
+import { SpikesManager } from '../Scripts/Spikes/SpikesManager'
 
 export default class DateManager extends Singleton {
   static get Instance() {
@@ -29,7 +31,11 @@ export default class DateManager extends Singleton {
 
   door: DoorManager
 
+  burst: BurstManager[] = []
+
   enemies: EnemyManager[]
+
+  Spikes: SpikesManager[]
 
   reset() {
     this.mapInfo = []
@@ -37,6 +43,8 @@ export default class DateManager extends Singleton {
     this.enemies = []
     this.player = null
     this.door = null
+    this.burst = []
+    this.Spikes = []
     this.mapRowCount = 0
     this.mapColumnCount = 0
   }

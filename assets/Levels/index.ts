@@ -15,6 +15,13 @@ export interface IEntity {
   direction: DIRECTION_ENUM
   state: ENTITY_STATE_ENUM
 }
+
+export interface ISpikes {
+  x: number
+  y: number
+  type: ENTITY_TYPE_ENUM
+  count: number
+}
 /** 单个瓦片的数据结构 */
 export interface ITile {
   src: number | null

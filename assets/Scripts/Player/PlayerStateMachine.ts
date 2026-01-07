@@ -9,6 +9,7 @@ import { EntityManager } from '../../Base/EntityManager'
 import BlockTurnLeftSubStateMachine from './BlockTurnLeftSubStateMachine'
 import DeathSubStateMachine from './DeathSubStateMachine'
 import AttackSubStateMachine from './AttackSubStateMachine'
+import AirFeathSubStateMachine from './AirFeathSubStateMachine'
 
 const { ccclass, property } = _decorator
 
@@ -21,6 +22,7 @@ export class PlayerStateMachine extends StateMachine {
   private blockturnleftSubStateMachine: BlockTurnLeftSubStateMachine
   private deathSubStateMachine: DeathSubStateMachine
   private attackSubStateMachine: AttackSubStateMachine
+  private airdeathSubStateMachine: AirFeathSubStateMachine
 
   async init() {
     this.animationComponent = this.addComponent(Animation)
@@ -38,6 +40,7 @@ export class PlayerStateMachine extends StateMachine {
     this.params.set(getParamKey('TURNRIGHT'), getInitParmesTrigger())
     this.params.set(getParamKey('DIRECTION'), getInitParmesNumber())
     this.params.set(getParamKey('BLOCKTURNLEFT'), getInitParmesTrigger())
+    this.params.set(getParamKey('AIRDEATH'), getInitParmesTrigger())
     this.params.set(getParamKey('DEATH'), getInitParmesTrigger())
     this.params.set(getParamKey('ATTACK'), getInitParmesTrigger())
   }
@@ -50,6 +53,7 @@ export class PlayerStateMachine extends StateMachine {
     this.blockturnleftSubStateMachine = new BlockTurnLeftSubStateMachine(this)
     this.deathSubStateMachine = new DeathSubStateMachine(this)
     this.attackSubStateMachine = new AttackSubStateMachine(this)
+    this.airdeathSubStateMachine = new AirFeathSubStateMachine(this)
   }
 
   initAnimationEvent() {
@@ -57,7 +61,14 @@ export class PlayerStateMachine extends StateMachine {
       const name = this.animationComponent.defaultClip.name
       const whiteList = ['block', 'turn', 'attack']
       if (whiteList.some(v => name.includes(v))) {
-        this.node.getComponent(EntityManager).state = ENTITY_STATE_ENUM.IDLE
+        const entityManager = this.node.getComponent(EntityManager)
+        if (!entityManager) {
+          return
+        }
+        if (entityManager.state === ENTITY_STATE_ENUM.DEATH || entityManager.state === ENTITY_STATE_ENUM.AIRDEATH) {
+          return
+        }
+        entityManager.state = ENTITY_STATE_ENUM.IDLE
       }
     })
   }
@@ -68,10 +79,13 @@ export class PlayerStateMachine extends StateMachine {
     const idle = this.getParames(getParamKey('IDLE'))
     const blockfront = this.getParames(getParamKey('BLOCKFRONT'))
     const blockturnleft = this.getParames(getParamKey('BLOCKTURNLEFT'))
+    const airdeath = this.getParames(getParamKey('AIRDEATH'))
     const death = this.getParames(getParamKey('DEATH'))
     const attack = this.getParames(getParamKey('ATTACK'))
     if (death) {
       this.deathSubStateMachine.run()
+    } else if (airdeath) {
+      this.airdeathSubStateMachine.run()
     } else if (attack) {
       this.attackSubStateMachine.run()
     } else if (turnLeft) {

@@ -12,11 +12,13 @@ import levels, { ILevel } from '../../Levels'
 import DateManager from '../../Runtime/DateManager'
 import { TILE_WIDTH } from '../Tlie/TileManager'
 import EventManager from '../../Runtime/EventManager'
-import { DIRECTION_ENUM, ENTITY_STATE_ENUM, EVENT_ENUM } from '../../Enums'
+import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enums'
 import { PlayerManager } from '../Player/PlayerManager'
 import { WoodenSkeletonManager } from '../WoodenSkeleton/WoodenSkeletonManager'
 import { IronSkeletonManager } from '../IronSkeleton/IronSkeletonManager'
 import { DoorManager } from '../Door/DoorManager'
+import { BurstManager } from '../Burst/BurstManager'
+import { SpikesManager } from '../Spikes/SpikesManager'
 const { ccclass, property } = _decorator
 
 @ccclass('BatlleManager')
@@ -58,8 +60,10 @@ export class BatlleManager extends Component {
 
       this.generateTileMap()
       this.generatePlayer()
+      this.generateSpikes()
       this.generateEnemies()
       this.generateDoor()
+      this.generateBursts()
     }
   }
 
@@ -119,12 +123,41 @@ export class BatlleManager extends Component {
     door.setParent(this.stage)
     const doorManager = door.addComponent(DoorManager)
     await doorManager.init({
-      x: 9,
+      x: 7,
       y: 8,
       direction: DIRECTION_ENUM.TOP,
       state: ENTITY_STATE_ENUM.IDLE,
     })
     DateManager.Instance.door = doorManager
+  }
+
+  async generateBursts() {
+    const burst = createUINode() //地图
+    burst.setParent(this.stage)
+    burst.setSiblingIndex(1)
+    const burstManager = burst.addComponent(BurstManager)
+    await burstManager.init({
+      x: 2,
+      y: 6,
+      type: ENTITY_TYPE_ENUM.BURST,
+      direction: DIRECTION_ENUM.TOP,
+      state: ENTITY_STATE_ENUM.IDLE,
+    })
+    DateManager.Instance.burst.push(burstManager)
+  }
+
+  async generateSpikes() {
+    const spikes = createUINode() //地图
+    spikes.setParent(this.stage)
+    spikes.setSiblingIndex(1)
+    const spikesManager = spikes.addComponent(SpikesManager)
+    await spikesManager.init({
+      x: 2,
+      y: 7,
+      type: ENTITY_TYPE_ENUM.SPIKES_ONE,
+      count: 0,
+    })
+    DateManager.Instance.Spikes.push(spikesManager)
   }
 
   /** 根据地图尺寸将舞台居中偏移 */
