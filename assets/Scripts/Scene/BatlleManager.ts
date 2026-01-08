@@ -148,10 +148,10 @@ export class BatlleManager extends Component {
 
   async generateSpikes() {
     const configs = [
-      { x: 2, y: 6 },
-      { x: 3, y: 6 },
-      { x: 4, y: 6 },
-      { x: 5, y: 6 },
+      // { x: 2, y: 6, type: ENTITY_TYPE_ENUM.SPIKES_ONE },
+      // { x: 3, y: 6, type: ENTITY_TYPE_ENUM.SPIKES_TWO },
+      // { x: 4, y: 6, type: ENTITY_TYPE_ENUM.SPIKES_THREE },
+      { x: 2, y: 5, type: ENTITY_TYPE_ENUM.SPIKES_FOUR },
     ]
     for (const cfg of configs) {
       const spikes = createUINode() //地图
@@ -161,7 +161,7 @@ export class BatlleManager extends Component {
       await spikesManager.init({
         x: cfg.x,
         y: cfg.y,
-        type: ENTITY_TYPE_ENUM.SPIKES_ONE,
+        type: cfg.type,
         count: 0,
       })
       DateManager.Instance.Spikes.push(spikesManager)

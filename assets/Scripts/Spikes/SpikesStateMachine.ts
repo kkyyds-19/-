@@ -1,10 +1,12 @@
 import { _decorator, Animation } from 'cc'
-import { getParamKey } from '../../Enums'
+import { ENTITY_STATE_ENUM, getParamKey, SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM } from '../../Enums'
 import { getInitParmesNumber, StateMachine } from '../../Base/StateMachine'
 import SpikesOneSubStateMachine from './SpikesOneSubStateMachine'
 import SpilkesTwoSubStateMachine from './SpilkesTwoSubStateMachine'
 import SpikesThreeSubStateMachine from './SpikesThreeSubStateMachine'
 import SpikesFourSubStateMachine from './SpikesFourSubStateMachine'
+import { EntityManager } from '../../Base/EntityManager'
+import { SpikesManager } from './SpikesManager'
 
 const { ccclass, property } = _decorator
 
@@ -41,7 +43,20 @@ export class SpikesStateMachine extends StateMachine {
     this.spikesFourSubStateMachine = new SpikesFourSubStateMachine(this)
   }
 
-  initAnimationEvent() {}
+  initAnimationEvent() {
+    this.animationComponent.on(Animation.EventType.FINISHED, () => {
+      const name = this.animationComponent.defaultClip.name
+      const value = this.getParames(getParamKey('SPIKES_TOTAL_COUNT'))
+      if (
+        (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_ONE && name.includes('spikesone/two')) ||
+        (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_TWO && name.includes('spiketwo/three')) ||
+        (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_THREE && name.includes('spikethree/four')) ||
+        (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_FOUR && name.includes('spikefour/five'))
+      ) {
+        this.node.getComponent(SpikesManager).backZero()
+      }
+    })
+  }
 
   run() {
     const total = this.getParames(getParamKey('SPIKES_TOTAL_COUNT')) as number
