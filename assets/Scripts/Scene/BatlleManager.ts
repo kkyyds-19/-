@@ -31,6 +31,7 @@ export class BatlleManager extends Component {
   /** 组件加载时绑定事件 */
   onLoad() {
     EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevel, this)
+    EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.checkArrive, this)
   }
 
   /** 组件销毁时解绑事件 */
@@ -98,24 +99,37 @@ export class BatlleManager extends Component {
     const player = createUINode() //地图
     player.setParent(this.stage)
     const playerManager = player.addComponent(PlayerManager)
-    await playerManager.init({ x: 2, y: 8, direction: DIRECTION_ENUM.TOP, state: ENTITY_STATE_ENUM.IDLE })
+    await playerManager.init(this.level.player)
     DateManager.Instance.player = playerManager
     EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN, playerManager)
   }
   async generateEnemies() {
-    const enemy = createUINode() //地图
-    enemy.setParent(this.stage)
-    const woodenSkeletonManager = enemy.addComponent(WoodenSkeletonManager)
-    await woodenSkeletonManager.init()
-    DateManager.Instance.enemies.push(woodenSkeletonManager)
+    // 遍历关卡配置中的敌人数组，根据 type 生成对应骷髅
+    for (let i = 0; i < this.level.enemies.length; i++) {
+      const enemy = this.level.enemies[i]
 
-    const enemy2 = createUINode()
-    enemy2.setParent(this.stage)
-    const ironSkeletonManager = enemy2.addComponent(IronSkeletonManager)
-    await ironSkeletonManager.init()
-    ironSkeletonManager.x = 2
-    ironSkeletonManager.y = 2
-    DateManager.Instance.enemies.push(ironSkeletonManager)
+      // 为当前敌人创建节点并挂到舞台下
+      const node = createUINode()
+      node.setParent(this.stage)
+
+      // 根据关卡中配置的实体类型，选择具体的敌人管理器
+      let ManagerClass: typeof WoodenSkeletonManager | typeof IronSkeletonManager
+      if (enemy.type === ENTITY_TYPE_ENUM.SKELETON_WOODEN) {
+        ManagerClass = WoodenSkeletonManager
+      } else if (enemy.type === ENTITY_TYPE_ENUM.SKELETON_IRON) {
+        ManagerClass = IronSkeletonManager
+      } else {
+        // 非骷髅类型暂不处理，直接跳过
+        continue
+      }
+
+      // 添加对应管理器组件，并按照关卡配置初始化位置/朝向/初始状态
+      const manager = node.addComponent(ManagerClass)
+      await manager.init(enemy)
+
+      // 将敌人管理器存入全局 DateManager，方便其他系统（如攻击逻辑）访问
+      DateManager.Instance.enemies.push(manager)
+    }
   }
 
   async generateDoor() {
@@ -174,5 +188,13 @@ export class BatlleManager extends Component {
     const disX = (TILE_WIDTH * mapRowCount) / 2
     const disY = (TILE_WIDTH * mapColumnCount) / 2 - 580
     this.stage.setPosition(-disX, -disY)
+  }
+
+  checkArrive() {
+    const { x: playerX, y: playerY } = DateManager.Instance.player
+    const { x: doorX, y: doorY, state: doorState } = DateManager.Instance.door
+    if (playerX === doorX && playerY === doorY && doorState === ENTITY_STATE_ENUM.DEATH) {
+      EventManager.Instance.emit(EVENT_ENUM.NEXT_LEVEL)
+    }
   }
 }

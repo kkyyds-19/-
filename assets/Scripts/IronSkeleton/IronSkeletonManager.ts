@@ -4,27 +4,23 @@
  * @author 2026-01-06
  */
 import { _decorator } from 'cc'
-import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enums'
+import { ENTITY_STATE_ENUM, EVENT_ENUM } from '../../Enums'
 import { EnemyManager } from '../../Base/EnemyManager'
 import { IronSkeletonStateMachine } from './IronSkeletonStateMachine'
 import EventManager from '../../Runtime/EventManager'
 import DateManager from '../../Runtime/DateManager'
+import { IEntity } from '../../Levels'
 
 const { ccclass } = _decorator
 
 @ccclass('IronSkeletonManager')
 export class IronSkeletonManager extends EnemyManager {
-  async init() {
+  async init(params: IEntity) {
     this.fsm = this.addComponent(IronSkeletonStateMachine)
     await this.fsm.init()
 
-    await super.init({
-      x: 2,
-      y: 4,
-      type: ENTITY_TYPE_ENUM.SKELETON_IRON,
-      direction: DIRECTION_ENUM.TOP,
-      state: ENTITY_STATE_ENUM.IDLE,
-    })
+    // 使用关卡配置的敌人参数进行初始化
+    await super.init(params)
 
     // 监听玩家移动结束事件，尝试攻击
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack, this)

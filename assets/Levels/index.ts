@@ -31,6 +31,11 @@ export interface ITile {
 /** 关卡的数据结构 */
 export interface ILevel {
   mapInfo: Array<Array<ITile>>
+  player: IEntity
+  enemies: IEntity[]
+  spikes: ISpikes[]
+  bursts: IEntity[]
+  door: IEntity
 }
 const levels: Record<string, ILevel> = {
   level1,

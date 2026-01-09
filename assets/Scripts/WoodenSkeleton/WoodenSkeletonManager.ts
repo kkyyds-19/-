@@ -5,10 +5,11 @@
  */
 import { _decorator } from 'cc'
 import EventManager from '../../Runtime/EventManager'
-import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enums'
+import { ENTITY_STATE_ENUM, EVENT_ENUM } from '../../Enums'
 import { EnemyManager } from '../../Base/EnemyManager'
 import { WoodenSkeletonStateMachine } from './WoodenSkeletonStateMachine'
 import DateManager from '../../Runtime/DateManager'
+import { IEntity } from '../../Levels'
 
 const { ccclass } = _decorator
 
@@ -18,18 +19,12 @@ export class WoodenSkeletonManager extends EnemyManager {
    * 初始化木骷髅
    * 设置状态机并调用父类初始化
    */
-  async init() {
+  async init(params: IEntity) {
     this.fsm = this.addComponent(WoodenSkeletonStateMachine)
     await this.fsm.init()
 
-    // 调用父类初始化，传入木骷髅特定的初始参数
-    await super.init({
-      x: 2,
-      y: 4,
-      type: ENTITY_TYPE_ENUM.SKELETON_WOODEN,
-      direction: DIRECTION_ENUM.TOP,
-      state: ENTITY_STATE_ENUM.IDLE,
-    })
+    // 调用父类初始化，直接使用关卡中配置的实体参数
+    await super.init(params)
 
     // 监听玩家移动结束事件，尝试攻击
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack, this)
