@@ -28,7 +28,7 @@ export class IronSkeletonManager extends EnemyManager {
 
   onDestroy() {
     super.onDestroy()
-    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack)
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack, this)
   }
 
   /**

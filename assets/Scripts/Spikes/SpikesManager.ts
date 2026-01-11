@@ -59,7 +59,7 @@ export class SpikesManager extends Component {
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onLoop, this)
   }
   onDestroy() {
-    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onLoop)
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onLoop, this)
   }
 
   update() {

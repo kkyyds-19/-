@@ -39,7 +39,9 @@ export class BurstStateMachine extends StateMachine {
       this.starteMachines.set(ENTITY_STATE_ENUM.DEATH, new State(this, `${BASE_URL}/death`))
   }
 
-  initAnimationEvent() {}
+  initAnimationEvent() {
+    return
+  }
 
   run() {
     const idle = this.getParames(getParamKey('IDLE'))

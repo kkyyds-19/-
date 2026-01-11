@@ -1,7 +1,7 @@
 import Singleton from '../Base/Singleton'
 
 interface IItem {
-  func: Function
+  func: (...params: unknown[]) => void
   ctx: unknown
 }
 
@@ -24,7 +24,7 @@ export default class EventManager extends Singleton {
    * @param func 回调函数
    * @param ctx 回调中的上下文 (this)
    */
-  on(evenName: string, func: Function, ctx: unknown) {
+  on(evenName: string, func: (...params: unknown[]) => void, ctx: unknown) {
     if (this.eventDic.has(evenName)) {
       this.eventDic.get(evenName).push({ func, ctx })
     } else {
@@ -36,11 +36,21 @@ export default class EventManager extends Singleton {
    * 取消订阅事件
    * @param evenName 事件名
    * @param func 需要移除的回调
+   * @param ctx 回调中的上下文 (this)。不传则移除该 func 的所有订阅
    */
-  off(evenName: string, func: Function) {
-    if (this.eventDic.has(evenName)) {
-      const index = this.eventDic.get(evenName).findIndex(i => i.func === func)
-      index > -1 && this.eventDic.get(evenName).splice(index, 1)
+  off(evenName: string, func: (...params: unknown[]) => void, ctx?: unknown) {
+    if (!this.eventDic.has(evenName)) {
+      return
+    }
+
+    const list = this.eventDic.get(evenName)
+    const next =
+      ctx === undefined ? list.filter(i => i.func !== func) : list.filter(i => i.func !== func || i.ctx !== ctx)
+
+    if (next.length) {
+      this.eventDic.set(evenName, next)
+    } else {
+      this.eventDic.delete(evenName)
     }
   }
 

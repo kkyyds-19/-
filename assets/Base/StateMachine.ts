@@ -18,7 +18,7 @@ export const getInitParmesTrigger = () => {
   }
 }
 
-export const getInitParmesNumber = () =>{
+export const getInitParmesNumber = () => {
   return {
     type: FSM_PARAMS_TYPE_ENUM.NUMBER,
     value: 0,

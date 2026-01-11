@@ -9,8 +9,8 @@ const { ccclass } = _decorator
 
 @ccclass('PlayerManager')
 export class PlayerManager extends EntityManager {
-  tragetX = 2
-  tragetY = 8
+  tragetX = 0
+  tragetY = 0
   isMoving = false
   private readonly speed = 1 / 10
 
@@ -21,9 +21,16 @@ export class PlayerManager extends EntityManager {
       ...params,
       type: ENTITY_TYPE_ENUM.PLAYER,
     })
+    this.tragetX = this.x
+    this.tragetY = this.y
 
     EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputHandle, this)
     EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDead, this)
+  }
+
+  onDestroy() {
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_CTRL, this.inputHandle, this)
+    EventManager.Instance.off(EVENT_ENUM.ATTACK_PLAYER, this.onDead, this)
   }
 
   update() {
@@ -138,16 +145,44 @@ export class PlayerManager extends EntityManager {
     }
   }
 
-  willAtttack(type: CONTROLLER_ENUM) {
+  /**
+   * 攻击判定逻辑
+   * @param inputDirection 当前输入的移动方向
+   * @returns 被攻击目标的ID，如果没有则返回空字符串
+   */
+  willAtttack(inputDirection: CONTROLLER_ENUM) {
+    // 1. 过滤掉已经死亡的敌人
     const enemies = DateManager.Instance.enemies.filter(enemy => enemy.state !== ENTITY_STATE_ENUM.DEATH)
+
     for (let i = 0; i < enemies.length; i++) {
-      const { x: enemxX, y: enemyY, id: enemyId } = enemies[i]
-      if (
-        type === CONTROLLER_ENUM.TOP &&
+      const { x: enemyX, y: enemyY, id: enemyId } = enemies[i]
+
+      // 2. 核心判定条件：
+      // - 输入方向必须与人物当前朝向一致（确保只有面朝敌人“走”过去时才触发攻击）
+      // - 敌人必须在玩家移动路径的正前方两格（相邻两格才允许攻击）
+      const isTopAttack =
+        inputDirection === CONTROLLER_ENUM.TOP &&
         this.direction === DIRECTION_ENUM.TOP &&
-        enemxX === this.x &&
-        enemyY === this.tragetY - 2
-      ) {
+        enemyX === this.x &&
+        enemyY === this.y - 2
+      const isBottomAttack =
+        inputDirection === CONTROLLER_ENUM.BOTTOM &&
+        this.direction === DIRECTION_ENUM.BOTTOM &&
+        enemyX === this.x &&
+        enemyY === this.y + 2
+      const isLeftAttack =
+        inputDirection === CONTROLLER_ENUM.LEFT &&
+        this.direction === DIRECTION_ENUM.LEFT &&
+        enemyY === this.y &&
+        enemyX === this.x - 2
+      const isRightAttack =
+        inputDirection === CONTROLLER_ENUM.RIGHT &&
+        this.direction === DIRECTION_ENUM.RIGHT &&
+        enemyY === this.y &&
+        enemyX === this.x + 2
+
+      if (isTopAttack || isBottomAttack || isLeftAttack || isRightAttack) {
+        // 判定成功，切换到攻击状态并返回目标ID
         this.state = ENTITY_STATE_ENUM.ATTACK
         return enemyId
       }
@@ -199,7 +234,18 @@ export class PlayerManager extends EntityManager {
       }
     }
 
-    // 2. 检查 玩家本体 是否碰到墙壁 (Tile)
+    // 2. 检查 玩家本体 是否碰到 门
+    // 特殊逻辑：如果碰到门且门已打开，则忽略地形阻挡，直接放行（因为门可能放在墙上）
+    const door = DateManager.Instance.door
+    if (door && door.x === nextX && door.y === nextY) {
+      if (door.state !== ENTITY_STATE_ENUM.DEATH) {
+        this.state = ENTITY_STATE_ENUM.BLOCKFRONT
+        return true
+      }
+      return false
+    }
+
+    // 3. 检查 玩家本体 是否碰到墙壁 (Tile)
     // 注意：需要使用 nextX/nextY 检测移动后的位置
     // ?. 可选链防止数组越界报错
     const playerTile = tileInfo[nextX]?.[nextY]
@@ -208,7 +254,7 @@ export class PlayerManager extends EntityManager {
       return true
     }
 
-    // 3. 检查 武器/前方 是否碰到墙壁
+    // 4. 检查 武器/前方 是否碰到墙壁
     // 武器位置基于 玩家新位置 + 新朝向 计算
     // 这里的 DIRECTION_ENUM 决定了武器相对于人物的偏移量
     let weaponNextX = nextX
@@ -216,13 +262,6 @@ export class PlayerManager extends EntityManager {
 
     // 2.1 检查 玩家本体 是否碰到 敌人
     if (enemies.find(v => v.x === nextX && v.y === nextY)) {
-      this.state = ENTITY_STATE_ENUM.BLOCKFRONT
-      return true
-    }
-
-    // 2.2 检查 玩家本体 是否碰到 门（未开启状态）
-    const door = DateManager.Instance.door
-    if (door && door.state !== ENTITY_STATE_ENUM.DEATH && door.x === nextX && door.y === nextY) {
       this.state = ENTITY_STATE_ENUM.BLOCKFRONT
       return true
     }

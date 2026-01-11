@@ -41,11 +41,10 @@ export class BurstManager extends EntityManager {
   }
 
   /**
-   * 销毁时移除特定事件监听，并调用父类销毁
+   * 销毁时移除特定事件监听
    */
   onDestroy() {
-    super.onDestroy()
-    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onBurst)
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onBurst, this)
   }
   /**
    * 攻击逻辑

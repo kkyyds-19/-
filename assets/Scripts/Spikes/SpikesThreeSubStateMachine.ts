@@ -16,4 +16,3 @@ export default class SpikesThreeSubStateMachine extends SpikesSubStateMachine {
     this.starteMachines.set(SPIKE_COUNT_ENUM.FOUR, new State(fsm, `${BASE_URL}/four`, AnimationClip.WrapMode.Normal))
   }
 }
-

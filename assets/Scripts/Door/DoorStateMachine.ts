@@ -41,7 +41,9 @@ export class DoorStateMachine extends StateMachine {
     this.doorSubStateMachine = new DoorSubStateMachine(this)
   }
 
-  initAnimationEvent() {}
+  initAnimationEvent() {
+    return
+  }
 
   run() {
     const idle = this.getParames(getParamKey('IDLE'))

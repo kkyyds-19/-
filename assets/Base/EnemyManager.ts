@@ -46,9 +46,9 @@ export abstract class EnemyManager extends EntityManager {
    * 销毁时移除事件监听
    */
   onDestroy() {
-    EventManager.Instance.off(EVENT_ENUM.PLAYER_BORN, this.onChangeDirection)
-    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onChangeDirection)
-    EventManager.Instance.off(EVENT_ENUM.ATTACK_ENEMY, this.onDead)
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_BORN, this.onChangeDirection, this)
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onChangeDirection, this)
+    EventManager.Instance.off(EVENT_ENUM.ATTACK_ENEMY, this.onDead, this)
   }
 
   /**

@@ -6,8 +6,8 @@ export default class Singleton {
   private static _instance: any = null
 
   //单例模式
-  static GetInstance<T>():T{
-    if(this._instance === null){
+  static GetInstance<T>(): T {
+    if (this._instance === null) {
       this._instance = new this()
     }
 

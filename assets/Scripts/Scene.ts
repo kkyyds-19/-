@@ -1,6 +1,5 @@
-
-import { _decorator, Component, Node } from 'cc';
-const { ccclass, property } = _decorator;
+import { _decorator, Component, Node } from 'cc'
+const { ccclass, property } = _decorator
 
 /**
  * Predefined variables
@@ -13,30 +12,30 @@ const { ccclass, property } = _decorator;
  * ManualUrl = https://docs.cocos.com/creator/3.4/manual/zh/
  *
  */
- 
+
 /**
  * 场景脚本入口：用于绑定全局场景级逻辑
  * 可在 `start()` 中进行初始加载或跳转控制
  */
 @ccclass('Scene')
 export class Scene extends Component {
-    // [1]
-    // dummy = '';
+  // [1]
+  // dummy = '';
 
-    // [2]
-    // @property
-    // serializableDummy = 0;
+  // [2]
+  // @property
+  // serializableDummy = 0;
 
-    /**
-     * 场景启动回调：在此执行初始化流程
-     */
-    start () {
-        // TODO: 根据项目需要添加场景初始化逻辑
-    }
+  /**
+   * 场景启动回调：在此执行初始化流程
+   */
+  start() {
+    // TODO: 根据项目需要添加场景初始化逻辑
+  }
 
-    // update (deltaTime: number) {
-    //     // [4]
-    // }
+  // update (deltaTime: number) {
+  //     // [4]
+  // }
 }
 
 /**

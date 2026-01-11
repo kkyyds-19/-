@@ -27,6 +27,8 @@ export default class DateManager extends Singleton {
   /** 当前关卡索引，默认从 1 开始 */
   levelIndex = 1
 
+  levelTransitioning = false
+
   player: PlayerManager
 
   door: DoorManager
@@ -47,6 +49,7 @@ export default class DateManager extends Singleton {
     this.Spikes = []
     this.mapRowCount = 0
     this.mapColumnCount = 0
+    this.levelTransitioning = false
   }
 }
 
