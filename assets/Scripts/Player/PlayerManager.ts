@@ -105,15 +105,19 @@ export class PlayerManager extends EntityManager {
     if (inputDirection === CONTROLLER_ENUM.TOP) {
       this.tragetY -= 1
       this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.TOP)
     } else if (inputDirection === CONTROLLER_ENUM.BOTTOM) {
       this.tragetY += 1
       this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.BOTTOM)
     } else if (inputDirection === CONTROLLER_ENUM.LEFT) {
       this.tragetX -= 1
       this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.LEFT)
     } else if (inputDirection === CONTROLLER_ENUM.RIGHT) {
       this.tragetX += 1
       this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.RIGHT)
     } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT) {
       this.isMoving = false
       if (this.direction === DIRECTION_ENUM.TOP) {
@@ -143,6 +147,10 @@ export class PlayerManager extends EntityManager {
 
       EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
     }
+  }
+
+  showSmoke(inputDirection: DIRECTION_ENUM) {
+    EventManager.Instance.emit(EVENT_ENUM.SHOW_SMOKE, this.x, this.y, inputDirection)
   }
 
   /**
@@ -250,6 +258,7 @@ export class PlayerManager extends EntityManager {
     // ?. 可选链防止数组越界报错
     const playerTile = tileInfo[nextX]?.[nextY]
     if (!playerTile || !playerTile.moveable) {
+      EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
       this.state = ENTITY_STATE_ENUM.BLOCKFRONT
       return true
     }
@@ -278,6 +287,7 @@ export class PlayerManager extends EntityManager {
 
     const weaponTile = tileInfo[weaponNextX]?.[weaponNextY]
     if (!weaponTile || !weaponTile.moveable) {
+      EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
       this.state = ENTITY_STATE_ENUM.BLOCKTURNLEFT
       return true
     }

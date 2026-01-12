@@ -19,6 +19,9 @@ import { IronSkeletonManager } from '../IronSkeleton/IronSkeletonManager'
 import { DoorManager } from '../Door/DoorManager'
 import { BurstManager } from '../Burst/BurstManager'
 import { SpikesManager } from '../Spikes/SpikesManager'
+import { SmokeManager } from '../smoke/SmokeManager'
+import { ShakeManager } from '../UI/ShakeManager'
+import FaderManager from '../../Runtime/FaderManager'
 const { ccclass, property } = _decorator
 
 @ccclass('BatlleManager')
@@ -31,6 +34,8 @@ export class BatlleManager extends Component {
   stage: Node
   /** 是否正在切换关卡 */
   inTransition = false
+  private smokeLayer: Node
+  private smokePool: SmokeManager[] = []
 
   /** 组件加载时绑定事件 */
   onLoad() {
@@ -55,6 +60,7 @@ export class BatlleManager extends Component {
     BatlleManager.runtimeInstance = this
     EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevel, this)
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.checkArrive, this)
+    EventManager.Instance.on(EVENT_ENUM.SHOW_SMOKE, this.generateSmoke, this)
   }
 
   /** 组件销毁时解绑事件 */
@@ -76,9 +82,10 @@ export class BatlleManager extends Component {
    * - 将 mapInfo/行列数写入 DateManager
    * - 生成瓦片地图
    */
-  initLevel() {
+  async initLevel() {
     const level = levels[`level${DateManager.Instance.levelIndex}`]
     if (level) {
+      await FaderManager.Instance.fadeIn()
       if (this.inTransition) {
         this.inTransition = false
       }
@@ -96,12 +103,17 @@ export class BatlleManager extends Component {
       DateManager.Instance.mapColumnCount = this.level.mapInfo.length || 0
       DateManager.Instance.mapRowCount = this.level.mapInfo[0].length || 0
 
-      this.generateTileMap()
-      this.generatePlayer()
-      this.generateSpikes()
-      this.generateEnemies()
-      this.generateDoor()
-      this.generateBursts()
+      await Promise.all([
+        this.generateTileMap(),
+        this.generateSmokeLayer(),
+        this.generatePlayer(),
+        this.generateSpikes(),
+        this.generateEnemies(),
+        this.generateDoor(),
+        this.generateBursts(),
+      ])
+
+      await FaderManager.Instance.fadeOut()
     }
   }
 
@@ -118,6 +130,7 @@ export class BatlleManager extends Component {
 
   clearLevel() {
     this.stage.destroyAllChildren()
+    this.smokePool = []
     DateManager.Instance.reset()
   }
 
@@ -125,6 +138,7 @@ export class BatlleManager extends Component {
   generateStage() {
     this.stage = createUINode() //舞台
     this.stage.setParent(this.node)
+    this.stage.addComponent(ShakeManager)
   }
 
   /** 创建并初始化瓦片地图管理器组件 */
@@ -243,5 +257,38 @@ export class BatlleManager extends Component {
     if (playerX === doorX && playerY === doorY && doorState === ENTITY_STATE_ENUM.DEATH) {
       EventManager.Instance.emit(EVENT_ENUM.NEXT_LEVEL)
     }
+  }
+
+  /**
+   * 生成烟雾（带对象池优化）
+   * @param x 坐标X
+   * @param y 坐标Y
+   * @param direction 朝向
+   */
+  async generateSmoke(x: number, y: number, direction: DIRECTION_ENUM) {
+    // 1. 尝试从池中获取一个当前未激活（已播放完）的烟雾管理器
+    let smokeManager = this.smokePool.find(s => !s.node.active)
+
+    if (!smokeManager) {
+      // 2. 如果池中没有可用的，则创建新的
+      const smoke = createUINode()
+      smoke.setParent(this.smokeLayer)
+      smokeManager = smoke.addComponent(SmokeManager)
+      this.smokePool.push(smokeManager)
+    }
+
+    // 3. 重新初始化（内部会处理 active = true 和状态重置）
+    await smokeManager.init({
+      x,
+      y,
+      direction,
+      state: ENTITY_STATE_ENUM.IDLE,
+      type: ENTITY_TYPE_ENUM.SMOKE,
+    })
+  }
+
+  generateSmokeLayer() {
+    this.smokeLayer = createUINode()
+    this.smokeLayer.setParent(this.stage)
   }
 }

@@ -1,7 +1,8 @@
 import { _decorator, AnimationClip, Component, Node, Animation, SpriteFrame } from 'cc'
 
 import State from './State'
-import { FSM_PARAMS_TYPE_ENUM } from '../Enums'
+import { EVENT_ENUM, FSM_PARAMS_TYPE_ENUM } from '../Enums'
+import EventManager from '../Runtime/EventManager'
 const { ccclass, property } = _decorator
 
 type ParamsValueType = boolean | number
@@ -65,4 +66,10 @@ export abstract class StateMachine extends Component {
   }
   abstract init(): void
   abstract run(): void
+
+  onTriggered(type?: string) {
+    if (type === '0') {
+      EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, 140, 10)
+    }
+  }
 }

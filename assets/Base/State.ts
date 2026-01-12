@@ -1,8 +1,5 @@
-import { animation, AnimationClip, Sprite, SpriteFrame, UITransform, Animation } from 'cc'
-import { PlayerStateMachine } from '../Scripts/Player/PlayerStateMachine'
-import { TILE_WIDTH } from '../Scripts/Tlie/TileManager'
+import { animation, AnimationClip, Sprite, SpriteFrame } from 'cc'
 import ResourceManager from '../Runtime/ResourceManager'
-import { getParamKey } from '../Enums'
 import { StateMachine } from './StateMachine'
 import { sortSpriteFrame } from '../Utils'
 
@@ -18,6 +15,7 @@ export default class State {
     private fsm: StateMachine,
     private path: string,
     private wrapMode: AnimationClip.WrapMode = AnimationClip.WrapMode.Normal,
+    private events: any[] = [],
   ) {
     this.init()
   }
@@ -41,19 +39,27 @@ export default class State {
     this.animationClip.name = this.path
     this.animationClip.wrapMode = this.wrapMode
     this.animationClip.duration = frames.length * ANIMATION_SPEED // 整个动画剪辑的周期
+
+    if (this.events?.length) {
+      this.animationClip.events = [...this.events]
+      return
+    }
+
+    const isAttackClip = this.path.includes('/attack') || this.path.includes('attack/') || this.path.includes('attack')
+    if (isAttackClip) {
+      const frame = Math.max(0, Math.min(this.animationClip.duration * 0.35, this.animationClip.duration - 0.001))
+      this.animationClip.events = [
+        {
+          frame,
+          func: 'onTriggered',
+          params: ['0'],
+        },
+      ]
+    }
   }
 
   run() {
     this.fsm.animationComponent.defaultClip = this.animationClip
     this.fsm.animationComponent.play()
-
-    // if (this.wrapMode === AnimationClip.WrapMode.Normal) {
-    //   this.fsm.animationComponent.once(Animation.EventType.FINISHED, () => {
-    //     const idleState = this.fsm.starteMachines.get(getParamKey('IDLE'))
-    //     if (idleState) {
-    //       this.fsm.currentState = idleState
-    //     }
-    //   })
-    // }
   }
 }
