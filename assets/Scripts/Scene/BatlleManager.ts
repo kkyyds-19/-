@@ -61,15 +61,24 @@ export class BatlleManager extends Component {
     EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevel, this)
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.checkArrive, this)
     EventManager.Instance.on(EVENT_ENUM.SHOW_SMOKE, this.generateSmoke, this)
+    EventManager.Instance.on(EVENT_ENUM.REVOKE_STEP, this.revokeStep, this)
   }
 
   /** 组件销毁时解绑事件 */
   onDestroy() {
     EventManager.Instance.off(EVENT_ENUM.NEXT_LEVEL, this.nextLevel, this)
     EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.checkArrive, this)
+    EventManager.Instance.off(EVENT_ENUM.REVOKE_STEP, this.revokeStep, this)
     if (BatlleManager.runtimeInstance === this) {
       BatlleManager.runtimeInstance = null
     }
+  }
+
+  revokeStep() {
+    if (this.inTransition || DateManager.Instance.levelTransitioning) {
+      return
+    }
+    DateManager.Instance.revokeStep()
   }
   start() {
     this.generateStage()
@@ -85,7 +94,7 @@ export class BatlleManager extends Component {
   async initLevel() {
     const level = levels[`level${DateManager.Instance.levelIndex}`]
     if (level) {
-      await FaderManager.Instance.fadeIn()
+      FaderManager.Instance.fader.setAlpha(1)
       if (this.inTransition) {
         this.inTransition = false
       }

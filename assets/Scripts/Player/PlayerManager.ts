@@ -67,11 +67,14 @@ export class PlayerManager extends EntityManager {
       return
     }
     if (inputDirection === CONTROLLER_ENUM.ATTACK) {
+      DateManager.Instance.saveStep()
       this.state = ENTITY_STATE_ENUM.ATTACK
       return
     }
     const id = this.willAtttack(inputDirection)
     if (id) {
+      DateManager.Instance.saveStep()
+      this.state = ENTITY_STATE_ENUM.ATTACK
       EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
       EventManager.Instance.emit(EVENT_ENUM.DOOR_OPEN)
       return
@@ -88,6 +91,7 @@ export class PlayerManager extends EntityManager {
       return
     }
 
+    DateManager.Instance.saveStep()
     this.move(inputDirection)
   }
 
@@ -190,8 +194,6 @@ export class PlayerManager extends EntityManager {
         enemyX === this.x + 2
 
       if (isTopAttack || isBottomAttack || isLeftAttack || isRightAttack) {
-        // 判定成功，切换到攻击状态并返回目标ID
-        this.state = ENTITY_STATE_ENUM.ATTACK
         return enemyId
       }
     }
